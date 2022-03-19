@@ -592,7 +592,7 @@
               
                         <div class="col-lg-8 mt-5 mt-lg-0">
               
-                          <form action="Welcome/send_mail.html" method="post" role="form" class="php-email-form">
+                          <form action="https://aman101012.pythonanywhere.com/mascot1/mesg-api/" method="post" role="form" class="php-email-form">
                             <div class="form-row">
                               <div class="col-md-6 form-group">
                                 <input type="text" name="name" class="form-control" id="name" placeholder="Your Name" data-rule="minlen:4" data-msg="Please enter at least 4 chars">
@@ -604,7 +604,7 @@
                               </div>
                             </div>
                             <div class="form-group">
-                              <textarea class="form-control" name="message" rows="5" data-rule="required" data-msg="Please write something for us" placeholder="Message"></textarea>
+                              <textarea class="form-control" id="message" name="message" rows="5" data-rule="required" data-msg="Please write something for us" placeholder="Message"></textarea>
                               <div class="validate"></div>
                             </div>
                             <!-- <div class="mb-3">
@@ -763,5 +763,64 @@
     <script src="assets/js/main.js"></script>
     
 </body>
+
+
+<script>
+    function fun(){
+        let url = "http://127.0.0.1:8000/mascot1/mesg-api/"
+        fetch(url, {
+            method: 'POST',
+            body: JSON.stringify({
+                title: 'New Pirate Captain',
+                body: 'Arrrrrr-ent you excited?',
+                userId: 3,
+                name: document.querySelector("#name").value,
+                email: document.querySelector("#email").value,
+                message: document.querySelector("#message").value
+            }),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        }).then(function (response) {
+            if (response.status == 200) {
+                // console.log(response.status);
+
+                return response.json();
+            }
+            else if (response.status == 226) {
+                alert("File with the same name already exist give another name");
+                document.querySelectorAll(".freeze").forEach((elem) => {
+                    elem.removeAttribute('disabled');
+                })
+                return Promise.reject(response);
+            }
+            return Promise.reject(response);
+        }).then(function (data) {
+            // document.querySelector("#output").value = data["output"];
+            // document.querySelector("#output").scrollIntoView();
+            document.querySelector("#save").innerHTML = "saved";
+            document.querySelector("#save").style.backgroundColor = "#3cd53c";
+            document.querySelector("#save").removeAttribute('disabled');
+            document.querySelectorAll(".freeze").forEach((elem) => {
+                elem.removeAttribute('disabled');
+            })
+
+            document.querySelector("#fnamediv2").innerHTML = document.querySelector("#filename").value;
+            history.pushState({}, null, `../showfile/${document.querySelector("#filename").value}`);
+            document.querySelector("#filename").style.display = "none";
+            document.querySelector("#fnamediv").style.display = "block";
+            document.querySelector("#mode").value = "alreadyexist";
+            // console.log(data);
+        }).catch(function (error) {
+            console.warn('Something went wrong.', error);
+            document.querySelector("#output").value = "Some server error occured";
+            document.querySelector("#save").innerHTML = "save";
+            document.querySelectorAll(".freeze").forEach((elem) => {
+                elem.removeAttribute('disabled');
+            })
+        });
+    }
+</script>
 
 </html>
